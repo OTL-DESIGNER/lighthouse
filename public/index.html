@@ -166,13 +166,11 @@
             
             <form id="lighthouse-form" class="space-y-4 md:space-y-0 md:flex md:gap-4">
                 <input 
-                type="url" 
+                type="text"
                 id="url" 
                 required
                 class="w-full md:flex-1 px-4 py-3 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                placeholder="Enter your website URL (e.g., example.com)"
-                autocomplete="url"
-                autocapitalize="off"
+                placeholder="Enter website URL (e.g., ontoplocal.com)"
             >
                 <button 
                     type="submit"
@@ -617,25 +615,23 @@ async function runLighthouseTest(url) {
     let url = document.getElementById('url').value.trim();
     console.log('Original URL:', url);
     
+    // Show loading state
+    modal.classList.remove('hidden');
+    document.querySelector('.loading-spinner').style.display = 'block';
+    startFactRotation();
+    updateLoadingModal(0);
+    results.style.opacity = '0';
+
     try {
-        // Add https if missing
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
+        // Remove any existing protocol and www
+        url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
         console.log('Formatted URL:', url);
         
-        results.style.opacity = '0';
-        
-        // Run the lighthouse test
         const data = await runLighthouseTest(url);
-        // ... rest of your code
-
         if (data.error) throw new Error(data.error);
 
-        // Update the scores
         updateScores(data);
 
-        // Show results after a short delay
         setTimeout(() => {
             results.style.opacity = '1';
             setTimeout(() => {
@@ -645,9 +641,11 @@ async function runLighthouseTest(url) {
         }, 1000);
 
     } catch (err) {
-        alert(`Error: ${err.message}`);
+        console.error('Test error:', err);
         modal.classList.add('hidden');
         stopFactRotation();
+        alert(err.message || 'An error occurred while testing the website');
+        
         // Reset progress
         currentProgress = 0;
         targetProgress = 0;
