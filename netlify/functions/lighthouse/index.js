@@ -1,13 +1,14 @@
 import fetch from 'node-fetch';
 
-// Track test progress
-const testProgress = new Map();
-
-export const handler = async (event) => {
+exports.handler = async (event, context) => {
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
 
@@ -16,7 +17,11 @@ export const handler = async (event) => {
   if (!url) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'URL is required' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      body: JSON.stringify({ error: 'URL is required' })
     };
   }
 
@@ -26,13 +31,8 @@ export const handler = async (event) => {
       throw new Error('API key not configured');
     }
 
-    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(
-      url
-    )}&key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa&strategy=mobile`;
-    
-    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(
-      url
-    )}&key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa&strategy=desktop`;
+    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa&strategy=mobile`;
+    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa&strategy=desktop`;
 
     const [mobileResponse, desktopResponse] = await Promise.all([
       fetch(mobileApiUrl),
@@ -65,11 +65,19 @@ export const handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
       body: JSON.stringify(results)
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
       body: JSON.stringify({ error: error.message })
     };
   }
