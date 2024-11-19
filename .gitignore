@@ -12,3 +12,6 @@ yarn-error.log*
 # IDE settings
 .vscode/
 .DS_Store
+
+# Local Netlify folder
+.netlify

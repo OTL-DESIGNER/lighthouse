@@ -514,7 +514,10 @@ async function runLighthouseTest(url) {
     const progressCheck = setInterval(async () => {
         if (!testComplete) {
             try {
-                const response = await fetch(`/api/lighthouse-status?url=${encodeURIComponent(url)}`);
+                const response = await fetch(`/.netlify/functions/lighthouse-status?url=${encodeURIComponent(url)}`);
+                if (!response.ok) {
+                    throw new Error('Status check failed');
+                }
                 const status = await response.json();
                 
                 if (status.progress !== undefined && status.progress !== lastProgress) {
@@ -525,18 +528,21 @@ async function runLighthouseTest(url) {
                 console.warn('Error checking progress:', err);
             }
         }
-    }, 250); // Check more frequently
+    }, 250);
 
     try {
-        const response = await fetch(`/api/lighthouse?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
+        const response = await fetch(`/.netlify/functions/lighthouse?url=${encodeURIComponent(url)}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to run test');
+        }
         
-        if (!response.ok) throw new Error(data.error || 'Failed to run test');
+        const data = await response.json();
         
         // Ensure we reach 100%
         testComplete = true;
         updateLoadingModal(100);
-        await new Promise(resolve => setTimeout(resolve, 500)); // Let animation complete
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Cleanup
         clearInterval(progressCheck);
@@ -558,7 +564,12 @@ async function runLighthouseTest(url) {
             progressAnimationFrame = null;
         }
         
-        throw err;
+        // Add more descriptive error message
+        if (err.message.includes('Failed to fetch')) {
+            throw new Error('Unable to connect to the server. Please check your internet connection.');
+        } else {
+            throw err;
+        }
     }
 }
 
@@ -616,14 +627,21 @@ async function runLighthouseTest(url) {
             results.style.opacity = '1';
             setTimeout(() => {
                 modal.classList.add('hidden');
-                stopFactRotation(); // Ensure facts stop when modal closes
+                stopFactRotation();
             }, 500);
         }, 1000);
 
     } catch (err) {
-        alert('Error running Lighthouse: ' + err.message);
+        alert(`Error: ${err.message}`);
         modal.classList.add('hidden');
-        stopFactRotation(); // Ensure facts stop on error
+        stopFactRotation();
+        // Reset progress
+        currentProgress = 0;
+        targetProgress = 0;
+        if (progressAnimationFrame) {
+            cancelAnimationFrame(progressAnimationFrame);
+            progressAnimationFrame = null;
+        }
     }
 });
 

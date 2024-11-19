@@ -1,11 +1,7 @@
 import fetch from 'node-fetch';
 
-let testProgress = new Map();
-
-// Helper function to get progress
-const getProgress = (url) => {
-  return testProgress.get(url) || 0;
-};
+// Track test progress
+const testProgress = new Map();
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'GET') {
@@ -24,31 +20,11 @@ export const handler = async (event) => {
     };
   }
 
-  const API_KEY = process.env.API_KEY;
-
-  if (!API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'API key not configured' }),
-    };
-  }
-
   try {
-    // Your existing lighthouse test code here, modified for serverless:
-    testProgress.set(url, 0);
-
-    const startProgressUpdates = (currentValue, maxValue) => {
-      let progress = currentValue;
-      const interval = setInterval(() => {
-        if (progress < maxValue) {
-          progress += 0.5;
-          testProgress.set(url, progress);
-        }
-      }, 250);
-      return interval;
-    };
-
-    let progressInterval = startProgressUpdates(0, 10);
+    const API_KEY = process.env.API_KEY;
+    if (!API_KEY) {
+      throw new Error('API key not configured');
+    }
 
     const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(
       url
@@ -58,25 +34,43 @@ export const handler = async (event) => {
       url
     )}&key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa&strategy=desktop`;
 
-    clearInterval(progressInterval);
-    testProgress.set(url, 10);
-    progressInterval = startProgressUpdates(10, 60);
-
     const [mobileResponse, desktopResponse] = await Promise.all([
       fetch(mobileApiUrl),
       fetch(desktopApiUrl)
     ]);
 
-    // Rest of your existing code...
-    
+    const [mobileData, desktopData] = await Promise.all([
+      mobileResponse.json(),
+      desktopResponse.json()
+    ]);
+
+    const formatScore = (score) => score ? Math.round(score * 100) : 'N/A';
+
+    const results = {
+      mobile: {
+        performance: formatScore(mobileData.lighthouseResult.categories.performance?.score),
+        accessibility: formatScore(mobileData.lighthouseResult.categories.accessibility?.score),
+        bestPractices: formatScore(mobileData.lighthouseResult.categories['best-practices']?.score),
+        seo: formatScore(mobileData.lighthouseResult.categories.seo?.score),
+        pwa: formatScore(mobileData.lighthouseResult.categories.pwa?.score)
+      },
+      desktop: {
+        performance: formatScore(desktopData.lighthouseResult.categories.performance?.score),
+        accessibility: formatScore(desktopData.lighthouseResult.categories.accessibility?.score),
+        bestPractices: formatScore(desktopData.lighthouseResult.categories['best-practices']?.score),
+        seo: formatScore(desktopData.lighthouseResult.categories.seo?.score),
+        pwa: formatScore(desktopData.lighthouseResult.categories.pwa?.score)
+      }
+    };
+
     return {
       statusCode: 200,
-      body: JSON.stringify(results),
+      body: JSON.stringify(results)
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
