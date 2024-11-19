@@ -3,11 +3,16 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/api/lighthouse"
+  to = "/.netlify/functions/lighthouse"
   status = 200
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/lighthouse-status"
+  to = "/.netlify/functions/lighthouse-status"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
