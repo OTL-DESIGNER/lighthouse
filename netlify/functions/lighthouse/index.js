@@ -1,29 +1,42 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-// Helper function to format URL
-const formatUrl = (url) => {
-  // Remove leading/trailing whitespace
-  url = url.trim();
-  
-  // Remove any existing protocol and www
-  url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
-  
-  // Add https protocol
-  return `https://${url}`;
+// Helper function to format URLs consistently
+const formatUrl = (rawUrl) => {
+  try {
+    // Remove whitespace and ensure lowercase
+    let url = rawUrl.trim().toLowerCase();
+    
+    // Remove any protocol and www. prefix if they exist
+    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    
+    // Add https protocol
+    return `https://${url}`;
+  } catch (error) {
+    throw new Error('Invalid URL format');
+  }
 };
 
-// Helper function to format score
+// Helper function to format scores
 const formatScore = (score) => score ? Math.round(score * 100) : 'N/A';
 
 exports.handler = async (event, context) => {
-  // Standard headers for all responses
+  // Standard CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json'
   };
 
-  // Handle non-GET requests
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
+  }
+
+  // Ensure GET request
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
@@ -32,8 +45,9 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Check for URL parameter
-  if (!event.queryStringParameters?.url) {
+  // Validate URL parameter exists
+  const rawUrl = event.queryStringParameters?.url;
+  if (!rawUrl) {
     return {
       statusCode: 400,
       headers,
@@ -42,72 +56,65 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Format and validate URL
-    const url = formatUrl(event.queryStringParameters.url);
+    // Format and validate the URL
+    const url = formatUrl(rawUrl);
     
-    // Validate URL format
-    try {
-      new URL(url);
-    } catch (error) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Please enter a valid website URL (e.g., example.com)' })
-      };
-    }
-
-    // Check for API key
+    // Verify API key exists
     const API_KEY = process.env.API_KEY;
     if (!API_KEY) {
-      throw new Error('API key not configured');
+      throw new Error('API configuration error');
     }
 
-    // Construct API URLs
-    const baseParams = `key=${API_KEY}&category=performance&category=accessibility&category=best-practices&category=seo&category=pwa`;
-    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&${baseParams}&strategy=mobile`;
-    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&${baseParams}&strategy=desktop`;
+    // Common parameters for both requests
+    const baseParams = new URLSearchParams({
+      key: API_KEY,
+      category: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa']
+    });
 
-    // Fetch both mobile and desktop results
+    // Create API URLs
+    const createApiUrl = (strategy) => 
+      `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?${baseParams}&url=${encodeURIComponent(url)}&strategy=${strategy}`;
+
+    // Fetch both mobile and desktop data
+    console.log(`Starting analysis for ${url}`);
     const [mobileResponse, desktopResponse] = await Promise.all([
-      fetch(mobileApiUrl),
-      fetch(desktopApiUrl)
+      fetch(createApiUrl('mobile')),
+      fetch(createApiUrl('desktop'))
     ]);
 
-    // Check for API response errors
+    // Handle API errors
     if (!mobileResponse.ok || !desktopResponse.ok) {
-      throw new Error('Failed to fetch PageSpeed Insights data');
+      throw new Error('PageSpeed API request failed');
     }
 
-    // Parse JSON responses
+    // Parse responses
     const [mobileData, desktopData] = await Promise.all([
       mobileResponse.json(),
       desktopResponse.json()
     ]);
 
-    // Validate lighthouse results exist
+    // Validate responses have lighthouse results
     if (!mobileData.lighthouseResult || !desktopData.lighthouseResult) {
-      throw new Error('Invalid response from PageSpeed Insights API');
+      throw new Error('Invalid PageSpeed API response');
     }
 
-    // Format the results
+    // Extract and format scores
+    const getScores = (data) => ({
+      performance: formatScore(data.lighthouseResult.categories.performance?.score),
+      accessibility: formatScore(data.lighthouseResult.categories.accessibility?.score),
+      bestPractices: formatScore(data.lighthouseResult.categories['best-practices']?.score),
+      seo: formatScore(data.lighthouseResult.categories.seo?.score),
+      pwa: formatScore(data.lighthouseResult.categories.pwa?.score)
+    });
+
+    // Format final results
     const results = {
-      mobile: {
-        performance: formatScore(mobileData.lighthouseResult.categories.performance?.score),
-        accessibility: formatScore(mobileData.lighthouseResult.categories.accessibility?.score),
-        bestPractices: formatScore(mobileData.lighthouseResult.categories['best-practices']?.score),
-        seo: formatScore(mobileData.lighthouseResult.categories.seo?.score),
-        pwa: formatScore(mobileData.lighthouseResult.categories.pwa?.score)
-      },
-      desktop: {
-        performance: formatScore(desktopData.lighthouseResult.categories.performance?.score),
-        accessibility: formatScore(desktopData.lighthouseResult.categories.accessibility?.score),
-        bestPractices: formatScore(desktopData.lighthouseResult.categories['best-practices']?.score),
-        seo: formatScore(desktopData.lighthouseResult.categories.seo?.score),
-        pwa: formatScore(desktopData.lighthouseResult.categories.pwa?.score)
-      }
+      mobile: getScores(mobileData),
+      desktop: getScores(desktopData),
+      url: url // Include the formatted URL in response
     };
 
-    // Return successful response
+    console.log(`Analysis complete for ${url}`);
     return {
       statusCode: 200,
       headers,
@@ -115,15 +122,25 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    // Log error for debugging
     console.error('Lighthouse test error:', error);
+    
+    // Determine appropriate error message and status code
+    let statusCode = 500;
+    let message = 'An error occurred while analyzing the website';
 
-    // Return error response
+    if (error.message.includes('Invalid URL')) {
+      statusCode = 400;
+      message = 'Please enter a valid website URL (e.g., example.com)';
+    } else if (error.message.includes('API')) {
+      statusCode = 503;
+      message = 'Service temporarily unavailable, please try again later';
+    }
+
     return {
-      statusCode: error.statusCode || 500,
+      statusCode,
       headers,
       body: JSON.stringify({
-        error: error.message || 'An error occurred while running the test',
+        error: message,
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       })
     };
