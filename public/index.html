@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Performance Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+ @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes typewriter {
+        from { width: 0; }
+        to { width: 260px; } /* Fixed width for better typing effect */
+    }
+
+    @keyframes blink {
+        from, to { border-color: transparent }
+        50% { border-color: white; }
+    }
+
+    @keyframes factFade {
+        0% { transform: translateY(10px); opacity: 0; }
+        10%, 90% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-10px); opacity: 0; }
+    }
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-left-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: none;
+    }
+
+    .typewriter {
+        margin: 0 auto;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid white;
+        width: 260px; /* Fixed width */
+        animation: 
+            typewriter 2s steps(30, end),
+            blink 0.75s step-end infinite;
+    }
+
+    .fact-animate {
+        animation: factFade 4s ease-in-out;
+    }
+
+    .modal-animate-in {
+        animation: slideIn 0.3s ease-out forwards;
+    }
+
+    #desktop-results { display: none; }
+
+    .score-bar { transition: width 1s ease-out; }
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: white; }
+}
+
+/* Update fact animation */
+@keyframes factFade {
+    0% { transform: translateY(20px); opacity: 0; }
+    10% { transform: translateY(0); opacity: 1; }
+    90% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-20px); opacity: 0; }
+}
+
+.fact-animate {
+    animation: factFade 4s ease-in-out;
+}
+
+/* Update loading spinner for visibility */
+.loading-spinner {
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.2);
+    border-left-color: white;
+}
+        .loading .loading-spinner {
+            display: block;
+        }
+        
+        .score-bar {
+            transition: width 1s ease-out;
+        }
+        
+        .score-value {
+            transition: opacity 0.5s ease-out;
+        }
+
+        #desktop-results {
+            display: none;
+        }
+
+        /* Modal animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-animate-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Progress bar animation */
+        @keyframes progressFill {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        .progress-animate {
+            animation: progressFill 30s linear;
+        }
+
+        /* Fact fade animation */
+        @keyframes factFade {
+            0%, 100% { opacity: 0; transform: translateY(10px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+
+        .fact-animate {
+            animation: factFade 5s ease-in-out;
+        }
+        #fact-display {
+    transition: opacity 0.5s ease-in-out;
+}
+
+#progress-bar {
+    transition: width 0.3s ease-out;
+}
+#fact-display {
+    transition: opacity 0.5s ease-in-out;
+    min-height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#progress-bar {
+    transition: width 0.3s ease-out;
+}
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-16 mb-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Test Your Website Performance</h1>
+            <p class="text-xl opacity-90 mb-8">Our latest website builds consistently achieve 90+ Performance scores and perfect 100s in other metrics. See how your site measures up.</p>
+            
+            <form id="lighthouse-form" class="space-y-4 md:space-y-0 md:flex md:gap-4">
+                <input 
+                    type="url" 
+                    id="url" 
+                    required
+                    class="w-full md:flex-1 px-4 py-3 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    placeholder="Enter your website URL (e.g., https://example.com)"
+                >
+                <button 
+                    type="submit"
+                    class="w-full md:w-auto bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                >
+                    <span>Analyze Site</span>
+                    <div class="loading-spinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- Results Section -->
+        <div id="results" class="opacity-0 transition-opacity duration-500">
+            <div class="flex items-center gap-4 mb-8 border-b border-gray-200">
+                <button 
+                    id="mobile-tab"
+                    class="px-6 py-3 text-blue-600 border-b-2 border-blue-600 font-medium transition-colors"
+                >
+                    Mobile Results
+                </button>
+                <button 
+                    id="desktop-tab"
+                    class="px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                    Desktop Results
+                </button>
+            </div>
+
+            <!-- Mobile Results -->
+            <div id="mobile-results" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <!-- Performance -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Performance</h3>
+                            <p class="text-sm text-gray-500">Page load speed & interactivity</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="mobile-performance" class="text-blue-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="mobile-performance-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Accessibility</h3>
+                            <p class="text-sm text-gray-500">WCAG compliance & usability</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="mobile-accessibility" class="text-green-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="mobile-accessibility-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
+                            <p class="text-sm text-gray-500">Modern development standards</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="mobile-bestPractices" class="text-purple-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="mobile-bestPractices-bar" class="score-bar h-full bg-purple-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- SEO -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
+                            <p class="text-sm text-gray-500">Search engine optimization</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="mobile-seo" class="text-orange-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="mobile-seo-bar" class="score-bar h-full bg-orange-600 w-0"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Results -->
+            <div id="desktop-results" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <!-- Performance -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Performance</h3>
+                            <p class="text-sm text-gray-500">Page load speed & interactivity</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-performance" class="text-blue-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-performance-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Accessibility</h3>
+                            <p class="text-sm text-gray-500">WCAG compliance & usability</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-accessibility" class="text-green-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-accessibility-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
+                            <p class="text-sm text-gray-500">Modern development standards</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-bestPractices" class="text-purple-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-bestPractices-bar" class="score-bar h-full bg-purple-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- SEO -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
+                            <p class="text-sm text-gray-500">Search engine optimization</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-seo" class="text-orange-600">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-seo-bar" class="score-bar h-full bg-orange-600 w-0"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center mb-16">
+                <h2 class="text-2xl font-bold mb-4">Want to improve your scores?</h2>
+                <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+                    Our team specializes in building lightning-fast, accessible websites that deliver exceptional user experiences. Let's discuss how we can help you achieve perfect scores.
+                </p>
+                <a 
+                    href="https://calendly.com/your-link" 
+                    target="_blank"
+                    class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                    Book a Free Consultation
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="loading-modal" class="hidden fixed inset-0 bg-gradient-to-br from-blue-900/95 to-purple-900/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl max-w-lg w-full p-8 modal-animate-in text-white">
+            <div class="text-center mb-8">
+                <!-- Spinner Container -->
+                <div class="relative w-20 h-20 mx-auto mb-8">
+                    <div class="absolute inset-0 bg-blue-500/20 rounded-full animate-ping"></div>
+                    <div class="relative flex items-center justify-center w-full h-full bg-blue-600 rounded-full">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                
+                <!-- Title Container -->
+                <div class="mb-8">
+                    <h3 class="typewriter mx-auto text-2xl font-bold">
+                        Analyzing Your Website
+                    </h3>
+                </div>
+                
+                <!-- Fact Container -->
+                <div class="h-24 flex items-center justify-center mb-8">
+                    <p class="text-lg fact-animate px-4 text-white/90" id="fact-display"></p>
+                </div>
+            </div>
+    
+            <!-- Progress Container -->
+            <div class="relative">
+                <div class="h-2 bg-white/20 rounded-full overflow-hidden mb-3">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex justify-between text-sm text-white/80">
+                    <span id="progress-text">0%</span>
+                    <span class="text-white/60">Estimated time: ~30s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Get all necessary DOM elements
+    const form = document.getElementById('lighthouse-form');
+    const results = document.getElementById('results');
+    const modal = document.getElementById('loading-modal');
+    const mobileResults = document.getElementById('mobile-results');
+    const desktopResults = document.getElementById('desktop-results');
+    const mobileTab = document.getElementById('mobile-tab');
+    const desktopTab = document.getElementById('desktop-tab');
+
+    // Performance facts array - business and conversion focused
+    const performanceFacts = [
+        "A 1-second delay in page load time can lead to a 7% drop in conversions",
+        "Slow-loading websites lose $2.6 billion in sales annually due to visitor abandonment",
+        "46% of users don't revisit poorly performing websites, directly impacting customer retention",
+        "Pages that load within 5 seconds have 70% longer average sessions, leading to better engagement",
+        "Websites that load in under 2 seconds have an average conversion rate of 37%, compared to 3% for sites that take 5+ seconds",
+        "Google confirms that site speed is a direct ranking factor - slower sites rank lower in search results",
+        "74% of users will abandon mobile sites that take longer than 5 seconds to load, affecting mobile conversion rates",
+        "Amazon found that every 100ms of latency cost them 1% in sales - speed directly impacts revenue",
+        "Fast-loading sites appear more professional, with 88% of users less likely to return after a bad experience",
+        "E-commerce sites that improved load times by 1 second saw a 27% increase in conversion rate",
+        "Mobile users are 5x more likely to abandon a purchase if the site isn't optimized",
+        "Bounce rates increase by 103% when page load time goes from 1 to 6 seconds"
+    ];
+
+    // Track shown facts to prevent repetition
+ // Performance facts management
+const FACT_CHANGE_INTERVAL = 5000; // 5 seconds per fact
+let factChangeTimer = null;
+let usedFacts = new Set();
+
+function getNextFact() {
+    const unusedFacts = performanceFacts.filter(fact => !usedFacts.has(fact));
+    if (unusedFacts.length === 0) {
+        usedFacts.clear();
+        return performanceFacts[0];
+    }
+    const nextFact = unusedFacts[Math.floor(Math.random() * unusedFacts.length)];
+    usedFacts.add(nextFact);
+    return nextFact;
+}
+
+function startFactRotation() {
+    const factDisplay = document.getElementById('fact-display');
+    
+    // Show first fact immediately
+    factDisplay.style.opacity = '1';
+    factDisplay.textContent = getNextFact();
+    
+    // Set up periodic fact changes
+    factChangeTimer = setInterval(() => {
+        factDisplay.style.opacity = '0';
+        setTimeout(() => {
+            factDisplay.textContent = getNextFact();
+            factDisplay.style.opacity = '1';
+        }, 500);
+    }, FACT_CHANGE_INTERVAL);
+}
+
+function stopFactRotation() {
+    if (factChangeTimer) {
+        clearInterval(factChangeTimer);
+        factChangeTimer = null;
+    }
+}
+
+// Progress bar animation
+// Progress bar animation
+let currentProgress = 0;
+let targetProgress = 0;
+let progressAnimationFrame = null;
+
+function animateProgress() {
+    if (currentProgress < targetProgress) {
+        // Smoother acceleration with smaller steps
+        const diff = targetProgress - currentProgress;
+        const step = Math.max(0.1, Math.min(1, diff * 0.05));
+        currentProgress += step;
+        
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = `${currentProgress}%`;
+            progressText.textContent = `${Math.round(currentProgress)}%`;
+        }
+        
+        progressAnimationFrame = requestAnimationFrame(animateProgress);
+    } else if (currentProgress >= targetProgress) {
+        cancelAnimationFrame(progressAnimationFrame);
+        progressAnimationFrame = null;
+    }
+}
+
+function updateLoadingModal(progress) {
+    targetProgress = progress;
+    if (!progressAnimationFrame && currentProgress < targetProgress) {
+        progressAnimationFrame = requestAnimationFrame(animateProgress);
+    }
+}
+
+async function runLighthouseTest(url) {
+    // Reset progress
+    currentProgress = 0;
+    targetProgress = 0;
+    usedFacts.clear();
+    
+    if (progressAnimationFrame) {
+        cancelAnimationFrame(progressAnimationFrame);
+        progressAnimationFrame = null;
+    }
+
+    // Show modal and start animations
+    modal.classList.remove('hidden');
+    document.querySelector('.loading-spinner').style.display = 'block';
+    startFactRotation();
+    updateLoadingModal(0);
+
+    let testComplete = false;
+    let lastProgress = 0;
+
+    // Progress checking interval
+    const progressCheck = setInterval(async () => {
+        if (!testComplete) {
+            try {
+                const response = await fetch(`/api/lighthouse-status?url=${encodeURIComponent(url)}`);
+                const status = await response.json();
+                
+                if (status.progress !== undefined && status.progress !== lastProgress) {
+                    lastProgress = status.progress;
+                    updateLoadingModal(status.progress);
+                }
+            } catch (err) {
+                console.warn('Error checking progress:', err);
+            }
+        }
+    }, 250); // Check more frequently
+
+    try {
+        const response = await fetch(`/api/lighthouse?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Failed to run test');
+        
+        // Ensure we reach 100%
+        testComplete = true;
+        updateLoadingModal(100);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Let animation complete
+        
+        // Cleanup
+        clearInterval(progressCheck);
+        stopFactRotation();
+        
+        if (progressAnimationFrame) {
+            cancelAnimationFrame(progressAnimationFrame);
+            progressAnimationFrame = null;
+        }
+        
+        return data;
+    } catch (err) {
+        testComplete = true;
+        clearInterval(progressCheck);
+        stopFactRotation();
+        
+        if (progressAnimationFrame) {
+            cancelAnimationFrame(progressAnimationFrame);
+            progressAnimationFrame = null;
+        }
+        
+        throw err;
+    }
+}
+
+    // Update score displays
+    function updateScores(data) {
+        const categories = ['performance', 'accessibility', 'bestPractices', 'seo'];
+        
+        categories.forEach(category => {
+            // Mobile scores
+            const mobileScore = data.mobile[category];
+            const mobileElement = document.getElementById(`mobile-${category}`);
+            const mobileBar = document.getElementById(`mobile-${category}-bar`);
+            
+            if (mobileElement && mobileBar) {
+                const formattedMobileScore = Math.round(mobileScore);
+                mobileElement.textContent = `${formattedMobileScore}%`;
+                setTimeout(() => {
+                    mobileBar.style.width = `${formattedMobileScore}%`;
+                }, 100);
+            }
+
+            // Desktop scores
+            const desktopScore = data.desktop[category];
+            const desktopElement = document.getElementById(`desktop-${category}`);
+            const desktopBar = document.getElementById(`desktop-${category}-bar`);
+            
+            if (desktopElement && desktopBar) {
+                const formattedDesktopScore = Math.round(desktopScore);
+                desktopElement.textContent = `${formattedDesktopScore}%`;
+                setTimeout(() => {
+                    desktopBar.style.width = `${formattedDesktopScore}%`;
+                }, 100);
+            }
+        });
+    }
+
+    // Form submit handler
+    form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    results.style.opacity = '0';
+    const url = document.getElementById('url').value;
+    
+    try {
+        // Run the lighthouse test
+        const data = await runLighthouseTest(url);
+
+        if (data.error) throw new Error(data.error);
+
+        // Update the scores
+        updateScores(data);
+
+        // Show results after a short delay
+        setTimeout(() => {
+            results.style.opacity = '1';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                stopFactRotation(); // Ensure facts stop when modal closes
+            }, 500);
+        }, 1000);
+
+    } catch (err) {
+        alert('Error running Lighthouse: ' + err.message);
+        modal.classList.add('hidden');
+        stopFactRotation(); // Ensure facts stop on error
+    }
+});
+
+    // Tab switching functionality
+    desktopTab.addEventListener('click', () => {
+        mobileTab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+        desktopTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+        mobileResults.style.display = 'none';
+        desktopResults.style.display = 'grid';
+    });
+
+    mobileTab.addEventListener('click', () => {
+        desktopTab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+        mobileTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+        desktopResults.style.display = 'none';
+        mobileResults.style.display = 'grid';
+    });
+</script>
+</body>
+</html>
