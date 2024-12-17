@@ -16,3 +16,17 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = []
+  external_node_modules = ["node-fetch"]
+
+[functions.lighthouse]
+  timeout = 30
+  memory = 1024
+  maxDuration = 30
+
+[functions.lighthouse-status]
+  timeout = 10
+  memory = 256

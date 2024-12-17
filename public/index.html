@@ -17,7 +17,7 @@
 
     @keyframes typewriter {
         from { width: 0; }
-        to { width: 260px; } /* Fixed width for better typing effect */
+        to { width: 270px; } /* Fixed width for better typing effect */
     }
 
     @keyframes blink {
@@ -50,7 +50,9 @@
             typewriter 2s steps(30, end),
             blink 0.75s step-end infinite;
     }
-
+    .text-2xl {
+        font-size: 1.3rem !important;
+    }
     .fact-animate {
         animation: factFade 4s ease-in-out;
     }
@@ -155,6 +157,74 @@
 #progress-bar {
     transition: width 0.3s ease-out;
 }
+.card-container {
+    height: auto; 
+}
+
+.card {
+    position: relative;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+}
+.card {
+    transition: opacity 0.3s ease;
+}
+
+.card.opacity-50 {
+    cursor: not-allowed;
+}
+/* Touch ripple effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .5s, opacity 1s;
+}
+
+.ripple:active:after {
+    transform: scale(0, 0);
+    opacity: .3;
+    transition: 0s;
+}
+
+/* Performance level indicators */
+.score-level {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.score-level.poor {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.score-level.fair {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.score-level.good {
+    background-color: #D1FAE5;
+    color: #059669;
+}
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -207,136 +277,258 @@
             <!-- Mobile Results -->
             <div id="mobile-results" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 <!-- Performance -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Performance</h3>
-                            <p class="text-sm text-gray-500">Page load speed & interactivity</p>
+                <div class="card-container">
+                    <div class="card ripple" data-category="performance">
+                        <div class="card-face card-front">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">Performance</h3>
+                                        <p class="text-sm text-gray-500">Page load speed & interactivity</p>
+                                    </div>
+                                    <div class="text-3xl font-bold">
+                                        <span id="mobile-performance">-</span>
+                                    </div>
+                                </div>
+                                <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                    <div id="mobile-performance-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                                </div>
+                                <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                                    </svg>
+                                    
+                                    Tap for suggestions
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-3xl font-bold">
-                            <span id="mobile-performance" class="text-blue-600">-</span>
-                        </div>
-                    </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="mobile-performance-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                        <!-- <div class="card-face card-back">
+                            <div class="card-content">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 id="mobile-performance-title" class="font-semibold text-gray-900"></h4>
+                                    <div id="mobile-performance-level" class="score-level"></div>
+                                </div>
+                                <ul id="mobile-performance-suggestions" class="text-sm text-gray-600 space-y-2"></ul>
+                                <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+                                    Tap to return
+                                </div>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
-
+            
                 <!-- Accessibility -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Accessibility</h3>
-                            <p class="text-sm text-gray-500">WCAG compliance & usability</p>
+                <div class="card-container">
+                    <div class="card ripple" data-category="accessibility">
+                        <div class="card-face card-front">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">Accessibility</h3>
+                                        <p class="text-sm text-gray-500">WCAG compliance & usability</p>
+                                    </div>
+                                    <div class="text-3xl font-bold">
+                                        <span id="mobile-accessibility">-</span>
+                                    </div>
+                                </div>
+                                <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                    <div id="mobile-accessibility-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                                </div>
+                                <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                                    </svg>
+                                    
+                                    Tap for suggestions
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-3xl font-bold">
-                            <span id="mobile-accessibility" class="text-green-600">-</span>
-                        </div>
-                    </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="mobile-accessibility-bar" class="score-bar h-full bg-green-600 w-0"></div>
                     </div>
                 </div>
 
-                <!-- Best Practices -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
-                            <p class="text-sm text-gray-500">Modern development standards</p>
+                 <!-- Best Practices -->
+                 <div class="card-container">
+                    <div class="card ripple" data-category="bestPractices">
+                        <div class="card-face card-front">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
+                                        <p class="text-sm text-gray-500">Modern development standards</p>
+                                    </div>
+                                    <div class="text-3xl font-bold">
+                                        <span id="mobile-bestPractices">-</span>
+                                    </div>
+                                </div>
+                                <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                    <div id="mobile-bestPractices-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                                </div>
+                                <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                                    </svg>
+                                    
+                                    Tap for suggestions
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-3xl font-bold">
-                            <span id="mobile-bestPractices" class="text-purple-600">-</span>
-                        </div>
-                    </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="mobile-bestPractices-bar" class="score-bar h-full bg-purple-600 w-0"></div>
                     </div>
                 </div>
 
-                <!-- SEO -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
-                            <p class="text-sm text-gray-500">Search engine optimization</p>
-                        </div>
-                        <div class="text-3xl font-bold">
-                            <span id="mobile-seo" class="text-orange-600">-</span>
+                     <!-- Search Engine Optimization -->
+                     <div class="card-container">
+                        <div class="card ripple" data-category="seo">
+                            <div class="card-face card-front">
+                                <div class="p-6">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
+                                            <p class="text-sm text-gray-500">Search Engine Optimization</p>
+                                        </div>
+                                        <div class="text-3xl font-bold">
+                                            <span id="mobile-seo">-</span>
+                                        </div>
+                                    </div>
+                                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                        <div id="mobile-seo-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                                        </svg>
+                                        
+                                        Tap for suggestions
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="mobile-seo-bar" class="score-bar h-full bg-orange-600 w-0"></div>
-                    </div>
-                </div>
-            </div>
+</div>
 
-            <!-- Desktop Results -->
-            <div id="desktop-results" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <!-- Performance -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
+<!-- Desktop Results -->
+<div id="desktop-results" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <!-- Performance -->
+    <div class="card-container">
+        <div class="card ripple" data-category="performance">
+            <div class="card-face card-front">
+                <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900">Performance</h3>
                             <p class="text-sm text-gray-500">Page load speed & interactivity</p>
                         </div>
                         <div class="text-3xl font-bold">
-                            <span id="desktop-performance" class="text-blue-600">-</span>
+                            <span id="desktop-performance">-</span>
                         </div>
                     </div>
                     <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
                         <div id="desktop-performance-bar" class="score-bar h-full bg-blue-600 w-0"></div>
                     </div>
+                    <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                        </svg>
+                        
+                        Tap for suggestions
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Accessibility -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
+    <!-- Accessibility -->
+    <div class="card-container">
+        <div class="card ripple" data-category="accessibility">
+            <div class="card-face card-front">
+                <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900">Accessibility</h3>
                             <p class="text-sm text-gray-500">WCAG compliance & usability</p>
                         </div>
                         <div class="text-3xl font-bold">
-                            <span id="desktop-accessibility" class="text-green-600">-</span>
+                            <span id="desktop-accessibility">-</span>
                         </div>
                     </div>
                     <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="desktop-accessibility-bar" class="score-bar h-full bg-green-600 w-0"></div>
+                        <div id="desktop-accessibility-bar" class="score-bar h-full bg-blue-600 w-0"></div>
                     </div>
-                </div>
-
-                <!-- Best Practices -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
-                            <p class="text-sm text-gray-500">Modern development standards</p>
-                        </div>
-                        <div class="text-3xl font-bold">
-                            <span id="desktop-bestPractices" class="text-purple-600">-</span>
-                        </div>
-                    </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="desktop-bestPractices-bar" class="score-bar h-full bg-purple-600 w-0"></div>
-                    </div>
-                </div>
-
-                <!-- SEO -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
-                            <p class="text-sm text-gray-500">Search engine optimization</p>
-                        </div>
-                        <div class="text-3xl font-bold">
-                            <span id="desktop-seo" class="text-orange-600">-</span>
-                        </div>
-                    </div>
-                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div id="desktop-seo-bar" class="score-bar h-full bg-orange-600 w-0"></div>
+                    <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                        </svg>
+                        
+                        Tap for suggestions
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Best Practices -->
+    <div class="card-container">
+        <div class="card ripple" data-category="bestPractices">
+            <div class="card-face card-front">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Best Practices</h3>
+                            <p class="text-sm text-gray-500">Modern Development Standards</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-bestPractices">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-bestPractices-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                    </div>
+                    <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                        </svg>
+                        
+                        Tap for suggestions
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Search Engine Optimization -->
+    <div class="card-container">
+        <div class="card ripple" data-category="seo">
+            <div class="card-face card-front">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">SEO</h3>
+                            <p class="text-sm text-gray-500">Search Engine Optimization</p>
+                        </div>
+                        <div class="text-3xl font-bold">
+                            <span id="desktop-seo">-</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="desktop-seo-bar" class="score-bar h-full bg-blue-600 w-0"></div>
+                    </div>
+                    <div class="mt-4 flex items-center justify-center text-sm text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flip-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2c.667 0 1 .333 1 1v7h2V4a1 1 0 112 0v6h1a2 2 0 012 2v4a5 5 0 01-5 5h-1a5 5 0 01-4.546-3.031L9 15.24V4a1 1 0 112 0v6h1V3c0-.667.333-1 1-1z" />
+                        </svg>
+                        
+                        Tap for suggestions
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
 
             <!-- CTA Section -->
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center mb-16">
@@ -345,7 +537,7 @@
                     Our team specializes in building lightning-fast, accessible websites that deliver exceptional user experiences. Let's discuss how we can help you achieve perfect scores.
                 </p>
                 <a 
-                    href="https://calendly.com/your-link" 
+                    href="https://ontoplocal.com/designer" 
                     target="_blank"
                     class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
@@ -390,82 +582,106 @@
             </div>
         </div>
     </div>
+
+
+    <div id="info-modal" class="hidden fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 relative">
+            <button id="close-info-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h3 id="modal-title" class="text-xl font-semibold mb-2"></h3>
+            <div id="modal-score" class="text-3xl font-bold mb-4"></div>
+            <div id="modal-level" class="inline-block mb-4"></div>
+            <ul id="modal-suggestions" class="space-y-2 text-gray-600"></ul>
+        </div>
+    </div>
+    
+
+
 <script>
-    // Get all necessary DOM elements
-    const form = document.getElementById('lighthouse-form');
-    const results = document.getElementById('results');
-    const modal = document.getElementById('loading-modal');
-    const mobileResults = document.getElementById('mobile-results');
-    const desktopResults = document.getElementById('desktop-results');
-    const mobileTab = document.getElementById('mobile-tab');
-    const desktopTab = document.getElementById('desktop-tab');
+// Global DOM Elements
+const form = document.getElementById('lighthouse-form');
+const results = document.getElementById('results');
+const modal = document.getElementById('loading-modal');
+const mobileResults = document.getElementById('mobile-results');
+const desktopResults = document.getElementById('desktop-results');
+const mobileTab = document.getElementById('mobile-tab');
+const desktopTab = document.getElementById('desktop-tab');
 
-    // Performance facts array - business and conversion focused
-    const performanceFacts = [
-        "A 1-second delay in page load time can lead to a 7% drop in conversions",
-        "Slow-loading websites lose $2.6 billion in sales annually due to visitor abandonment",
-        "46% of users don't revisit poorly performing websites, directly impacting customer retention",
-        "Pages that load within 5 seconds have 70% longer average sessions, leading to better engagement",
-        "Websites that load in under 2 seconds have an average conversion rate of 37%, compared to 3% for sites that take 5+ seconds",
-        "Google confirms that site speed is a direct ranking factor - slower sites rank lower in search results",
-        "74% of users will abandon mobile sites that take longer than 5 seconds to load, affecting mobile conversion rates",
-        "Amazon found that every 100ms of latency cost them 1% in sales - speed directly impacts revenue",
-        "Fast-loading sites appear more professional, with 88% of users less likely to return after a bad experience",
-        "E-commerce sites that improved load times by 1 second saw a 27% increase in conversion rate",
-        "Mobile users are 5x more likely to abandon a purchase if the site isn't optimized",
-        "Bounce rates increase by 103% when page load time goes from 1 to 6 seconds"
-    ];
-
-    // Track shown facts to prevent repetition
- // Performance facts management
-const FACT_CHANGE_INTERVAL = 5000; // 5 seconds per fact
+// Global State Variables
+let hasResults = false;
+let progressCheckInterval = null;
+let progressAnimationFrame = null;
+let currentProgress = 0;
+let targetProgress = 0;
 let factChangeTimer = null;
 let usedFacts = new Set();
 
-function getNextFact() {
-    const unusedFacts = performanceFacts.filter(fact => !usedFacts.has(fact));
-    if (unusedFacts.length === 0) {
-        usedFacts.clear();
-        return performanceFacts[0];
-    }
-    const nextFact = unusedFacts[Math.floor(Math.random() * unusedFacts.length)];
-    usedFacts.add(nextFact);
-    return nextFact;
+// Performance Facts Data
+const FACT_CHANGE_INTERVAL = 5000;
+const performanceFacts = [
+    "A 1-second delay in page load time can lead to a 7% drop in conversions",
+    "Slow-loading websites lose $2.6 billion in sales annually due to visitor abandonment",
+    "46% of users don't revisit poorly performing websites, directly impacting customer retention",
+    "Pages that load within 5 seconds have 70% longer average sessions, leading to better engagement",
+    "Websites that load in under 2 seconds have an average conversion rate of 37%, compared to 3% for sites that take 5+ seconds",
+    "Google confirms that site speed is a direct ranking factor - slower sites rank lower in search results",
+    "74% of users will abandon mobile sites that take longer than 5 seconds to load, affecting mobile conversion rates",
+    "Amazon found that every 100ms of latency cost them 1% in sales - speed directly impacts revenue",
+    "Fast-loading sites appear more professional, with 88% of users less likely to return after a bad experience",
+    "E-commerce sites that improved load times by 1 second saw a 27% increase in conversion rate",
+    "Mobile users are 5x more likely to abandon a purchase if the site isn't optimized",
+    "Bounce rates increase by 103% when page load time goes from 1 to 6 seconds"
+];
+
+// Card and UI Control Functions
+function disableCardClicks() {
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.pointerEvents = 'none';
+        card.classList.remove('cursor-pointer');
+        card.classList.add('opacity-50');
+    });
 }
 
-function startFactRotation() {
-    const factDisplay = document.getElementById('fact-display');
+function enableCardClicks() {
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.pointerEvents = 'auto';
+        card.classList.add('cursor-pointer');
+        card.classList.remove('opacity-50');
+        // Add click handler
+        card.addEventListener('click', handleCardClick);
+    });
+}
+
+function handleCardClick(e) {
+    if (!hasResults) return;
+    const card = e.currentTarget;
+    showModal(card);
+}
+
+function resetUI() {
+    hasResults = false;
+    disableCardClicks();
     
-    // Show first fact immediately
-    factDisplay.style.opacity = '1';
-    factDisplay.textContent = getNextFact();
-    
-    // Set up periodic fact changes
-    factChangeTimer = setInterval(() => {
-        factDisplay.style.opacity = '0';
-        setTimeout(() => {
-            factDisplay.textContent = getNextFact();
-            factDisplay.style.opacity = '1';
-        }, 500);
-    }, FACT_CHANGE_INTERVAL);
+    const categories = ['performance', 'accessibility', 'bestPractices', 'seo'];
+    categories.forEach(category => {
+        ['mobile', 'desktop'].forEach(device => {
+            const scoreElement = document.getElementById(`${device}-${category}`);
+            const barElement = document.getElementById(`${device}-${category}-bar`);
+            if (scoreElement) scoreElement.textContent = '-';
+            if (barElement) {
+                barElement.style.width = '0%';
+                barElement.className = 'score-bar h-full';
+            }
+        });
+    });
 }
 
-function stopFactRotation() {
-    if (factChangeTimer) {
-        clearInterval(factChangeTimer);
-        factChangeTimer = null;
-    }
-}
-
-// Progress bar animation
-// Progress bar animation
-let currentProgress = 0;
-let targetProgress = 0;
-let progressAnimationFrame = null;
-
+// Progress and Animation Functions
 function animateProgress() {
     if (currentProgress < targetProgress) {
-        // Smoother acceleration with smaller steps
         const diff = targetProgress - currentProgress;
         const step = Math.max(0.1, Math.min(1, diff * 0.05));
         currentProgress += step;
@@ -492,184 +708,576 @@ function updateLoadingModal(progress) {
     }
 }
 
+// Fact Rotation Functions
+function getNextFact() {
+    const unusedFacts = performanceFacts.filter(fact => !usedFacts.has(fact));
+    if (unusedFacts.length === 0) {
+        usedFacts.clear();
+        return performanceFacts[0];
+    }
+    const nextFact = unusedFacts[Math.floor(Math.random() * unusedFacts.length)];
+    usedFacts.add(nextFact);
+    return nextFact;
+}
+
+function startFactRotation() {
+    const factDisplay = document.getElementById('fact-display');
+    factDisplay.style.opacity = '1';
+    factDisplay.textContent = getNextFact();
+    
+    factChangeTimer = setInterval(() => {
+        factDisplay.style.opacity = '0';
+        setTimeout(() => {
+            factDisplay.textContent = getNextFact();
+            factDisplay.style.opacity = '1';
+        }, 500);
+    }, FACT_CHANGE_INTERVAL);
+}
+
+function stopFactRotation() {
+    if (factChangeTimer) {
+        clearInterval(factChangeTimer);
+        factChangeTimer = null;
+    }
+}
+
+// Main Test Function
+
+
 async function runLighthouseTest(url) {
-    // Reset progress
+    // Reset all states
     currentProgress = 0;
     targetProgress = 0;
     usedFacts.clear();
     
+    clearAllTimers();
+
+    let testComplete = false;
+    let lastProgress = 0;
+    let retryCount = 0;
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 2000;
+
+    try {
+        // Show modal and start animations
+        modal.classList.remove('hidden');
+        document.querySelector('.loading-spinner').style.display = 'block';
+        startFactRotation();
+        updateLoadingModal(0);
+
+        // Start progress checking
+        progressCheckInterval = setInterval(async () => {
+            if (!testComplete) {
+                try {
+                    const response = await fetch(`/.netlify/functions/lighthouse-status?url=${encodeURIComponent(url)}`);
+                    if (response.ok) {
+                        const status = await response.json();
+                        if (status.progress !== undefined && status.progress !== lastProgress) {
+                            lastProgress = status.progress;
+                            updateLoadingModal(status.progress);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Progress check error:', err);
+                }
+            }
+        }, 500); // Increased interval to reduce API calls
+
+        // Function to attempt the test
+        const attemptTest = async () => {
+            const response = await fetch(`/.netlify/functions/lighthouse?url=${encodeURIComponent(url)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || errorData.details || 'Failed to run test');
+            }
+
+            return await response.json();
+        };
+
+        // Try the test with retries
+        let data;
+        while (retryCount <= MAX_RETRIES) {
+            try {
+                data = await attemptTest();
+                break;
+            } catch (error) {
+                if (retryCount === MAX_RETRIES) throw error;
+                retryCount++;
+                console.log(`Retry attempt ${retryCount}`);
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * retryCount));
+            }
+        }
+
+        testComplete = true;
+        updateLoadingModal(100);
+
+        // Validate data structure
+        if (!data || !data.mobile || !data.desktop) {
+            throw new Error('Invalid response structure');
+        }
+
+        return {
+            mobile: {
+                performance: data.mobile.performance || 0,
+                accessibility: data.mobile.accessibility || 0,
+                bestPractices: data.mobile.bestPractices || 0,
+                seo: data.mobile.seo || 0
+            },
+            desktop: {
+                performance: data.desktop.performance || 0,
+                accessibility: data.desktop.accessibility || 0,
+                bestPractices: data.desktop.bestPractices || 0,
+                seo: data.desktop.seo || 0
+            }
+        };
+
+    } catch (err) {
+        console.error('Test error:', err);
+        throw new Error(err.message || 'Failed to analyze website. Please try again.');
+    } finally {
+        clearAllTimers();
+    }
+}
+
+// Add this new helper function to clean up timers
+function clearAllTimers() {
+    if (progressCheckInterval) {
+        clearInterval(progressCheckInterval);
+        progressCheckInterval = null;
+    }
     if (progressAnimationFrame) {
         cancelAnimationFrame(progressAnimationFrame);
         progressAnimationFrame = null;
     }
-
-    // Show modal and start animations
-    modal.classList.remove('hidden');
-    document.querySelector('.loading-spinner').style.display = 'block';
-    startFactRotation();
-    updateLoadingModal(0);
-
-    let testComplete = false;
-    let lastProgress = 0;
-
-    // Progress checking interval
-    const progressCheck = setInterval(async () => {
-        if (!testComplete) {
-            try {
-                const response = await fetch(`/.netlify/functions/lighthouse-status?url=${encodeURIComponent(url)}`);
-                if (!response.ok) {
-                    throw new Error('Status check failed');
-                }
-                const status = await response.json();
-                
-                if (status.progress !== undefined && status.progress !== lastProgress) {
-                    lastProgress = status.progress;
-                    updateLoadingModal(status.progress);
-                }
-            } catch (err) {
-                console.warn('Error checking progress:', err);
-            }
-        }
-    }, 250);
-
-    try {
-        const response = await fetch(`/.netlify/functions/lighthouse?url=${encodeURIComponent(url)}`);
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to run test');
-        }
-        
-        const data = await response.json();
-        
-        // Ensure we reach 100%
-        testComplete = true;
-        updateLoadingModal(100);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Cleanup
-        clearInterval(progressCheck);
-        stopFactRotation();
-        
-        if (progressAnimationFrame) {
-            cancelAnimationFrame(progressAnimationFrame);
-            progressAnimationFrame = null;
-        }
-        
-        return data;
-    } catch (err) {
-        testComplete = true;
-        clearInterval(progressCheck);
-        stopFactRotation();
-        
-        if (progressAnimationFrame) {
-            cancelAnimationFrame(progressAnimationFrame);
-            progressAnimationFrame = null;
-        }
-        
-        // Add more descriptive error message
-        if (err.message.includes('Failed to fetch')) {
-            throw new Error('Unable to connect to the server. Please check your internet connection.');
-        } else {
-            throw err;
-        }
+    if (factChangeTimer) {
+        clearInterval(factChangeTimer);
+        factChangeTimer = null;
     }
 }
 
-    // Update score displays
-    function updateScores(data) {
-        const categories = ['performance', 'accessibility', 'bestPractices', 'seo'];
-        
-        categories.forEach(category => {
-            // Mobile scores
-            const mobileScore = data.mobile[category];
-            const mobileElement = document.getElementById(`mobile-${category}`);
-            const mobileBar = document.getElementById(`mobile-${category}-bar`);
-            
-            if (mobileElement && mobileBar) {
-                const formattedMobileScore = Math.round(mobileScore);
-                mobileElement.textContent = `${formattedMobileScore}%`;
-                setTimeout(() => {
-                    mobileBar.style.width = `${formattedMobileScore}%`;
-                }, 100);
-            }
-
-            // Desktop scores
-            const desktopScore = data.desktop[category];
-            const desktopElement = document.getElementById(`desktop-${category}`);
-            const desktopBar = document.getElementById(`desktop-${category}-bar`);
-            
-            if (desktopElement && desktopBar) {
-                const formattedDesktopScore = Math.round(desktopScore);
-                desktopElement.textContent = `${formattedDesktopScore}%`;
-                setTimeout(() => {
-                    desktopBar.style.width = `${formattedDesktopScore}%`;
-                }, 100);
-            }
-        });
-    }
-
-    // Form submit handler
-    form.addEventListener('submit', async (e) => {
+// Form Submit Handler
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    let url = document.getElementById('url').value.trim();
-    console.log('Original URL:', url);
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.classList.add('hidden');
     
-    // Show loading state
-    modal.classList.remove('hidden');
-    document.querySelector('.loading-spinner').style.display = 'block';
-    startFactRotation();
-    updateLoadingModal(0);
-    results.style.opacity = '0';
+    let url = document.getElementById('url').value.trim();
+    if (!url) {
+        errorMessage.textContent = 'Please enter a valid URL';
+        errorMessage.classList.remove('hidden');
+        return;
+    }
 
     try {
-        // Remove any existing protocol and www
+        // Reset state and UI
+        hasResults = false;
+        resetUI();
         url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
-        console.log('Formatted URL:', url);
         
+        // Hide form and show consultation button
+        const formContainer = document.getElementById('lighthouse-form');
+        if (formContainer) {
+            formContainer.style.display = 'none';
+        }
+
+       // Add consultation button if not exists
+const heroSection = document.querySelector('.bg-gradient-to-br');
+if (heroSection) {
+    heroSection.className = 'flex items-center justify-center h-screen'; // Centering the button
+    if (!document.getElementById('book-consultation-btn')) {
+        const bookButton = document.createElement('a');
+        bookButton.id = 'book-consultation-btn';
+        bookButton.href = 'https://ontoplocal.com/designer';
+        bookButton.target = '_blank';
+        bookButton.textContent = 'Book a Free Consultation';
+        bookButton.className = 'inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors';
+        heroSection.appendChild(bookButton);
+    }
+}
+
+        // Show loading state
+        modal.classList.remove('hidden');
+        document.querySelector('.loading-spinner').style.display = 'block';
+        startFactRotation();
+        updateLoadingModal(0);
+        results.style.opacity = '0';
+
+        // Run test
         const data = await runLighthouseTest(url);
-        if (data.error) throw new Error(data.error);
+        
+        // Validate data
+        if (!data || !data.mobile || !data.desktop) {
+            throw new Error('Invalid response structure');
+        }
 
+        // Ensure all metrics exist
+        const requiredMetrics = ['performance', 'accessibility', 'bestPractices', 'seo'];
+        for (const device of ['mobile', 'desktop']) {
+            for (const metric of requiredMetrics) {
+                if (typeof data[device][metric] === 'undefined') {
+                    data[device][metric] = 0;
+                }
+            }
+        }
+
+        // Update UI with results
         updateScores(data);
-
-        setTimeout(() => {
-            results.style.opacity = '1';
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                stopFactRotation();
-            }, 500);
-        }, 1000);
+        results.style.opacity = '1';
+        
+        // Enable interactions
+        hasResults = true;
+        enableCardClicks();
+        
+        // Hide loading state
+        modal.classList.add('hidden');
+        stopFactRotation();
 
     } catch (err) {
         console.error('Test error:', err);
+        errorMessage.textContent = err.message || 'An error occurred while testing the website';
+        errorMessage.classList.remove('hidden');
         modal.classList.add('hidden');
         stopFactRotation();
-        alert(err.message || 'An error occurred while testing the website');
         
-        // Reset progress
-        currentProgress = 0;
-        targetProgress = 0;
+        // Show form again
+        const formContainer = document.getElementById('lighthouse-form');
+        if (formContainer) {
+            formContainer.style.display = 'block';
+        }
+
+        // Reset states
+        hasResults = false;
+        resetUI();
+        
+    } finally {
+        // Cleanup all intervals and animations
+        if (progressCheckInterval) {
+            clearInterval(progressCheckInterval);
+            progressCheckInterval = null;
+        }
         if (progressAnimationFrame) {
             cancelAnimationFrame(progressAnimationFrame);
             progressAnimationFrame = null;
+        }
+        if (factChangeTimer) {
+            clearInterval(factChangeTimer);
+            factChangeTimer = null;
         }
     }
 });
 
-    // Tab switching functionality
-    desktopTab.addEventListener('click', () => {
-        mobileTab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
-        desktopTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
-        mobileResults.style.display = 'none';
-        desktopResults.style.display = 'grid';
+// Suggestions Data Structure
+const suggestions = {
+    performance: {
+        poor: {
+            title: "Critical Performance Issues",
+            tips: [
+                "• Optimize and compress all images",
+                "• Remove render-blocking resources",
+                "• Reduce server response time",
+                "• Minimize JavaScript execution",
+                "• Enable text compression"
+            ]
+        },
+        fair: {
+            title: "Performance Improvements Needed",
+            tips: [
+                "• Implement lazy loading",
+                "• Optimize critical rendering path",
+                "• Use a CDN for assets",
+                "• Cache static resources",
+                "• Reduce unused JavaScript"
+            ]
+        },
+        good: {
+            title: "Good Performance",
+            tips: [
+                "• Monitor Core Web Vitals",
+                "• Implement performance budgets",
+                "• Consider preloading key resources",
+                "• Optimize new features",
+                "• Regular performance testing"
+            ]
+        }
+    },
+    accessibility: {
+        poor: {
+            title: "Critical Accessibility Issues",
+            tips: [
+                "• Add missing image alt text",
+                "• Fix color contrast issues",
+                "• Add proper form labels",
+                "• Ensure keyboard navigation",
+                "• Implement ARIA labels"
+            ]
+        },
+        fair: {
+            title: "Accessibility Needs Work",
+            tips: [
+                "• Improve heading structure",
+                "• Enhance focus indicators",
+                "• Add skip navigation links",
+                "• Improve form error messages",
+                "• Test with screen readers"
+            ]
+        },
+        good: {
+            title: "Good Accessibility",
+            tips: [
+                "• Regular accessibility audits",
+                "• Maintain ARIA implementation",
+                "• Keep testing with assistive tech",
+                "• Document accessibility features",
+                "• Monitor user feedback"
+            ]
+        }
+    },
+    bestPractices: {
+        poor: {
+            title: "Critical Best Practice Issues",
+            tips: [
+                "• Update outdated libraries",
+                "• Fix console errors",
+                "• Implement HTTPS",
+                "• Add error handling",
+                "• Fix browser compatibility issues"
+            ]
+        },
+        fair: {
+            title: "Best Practices Need Work",
+            tips: [
+                "• Improve error handling",
+                "• Update dependencies",
+                "• Implement security headers",
+                "• Add service worker",
+                "• Optimize image aspects"
+            ]
+        },
+        good: {
+            title: "Good Best Practices",
+            tips: [
+                "• Keep libraries updated",
+                "• Monitor security headers",
+                "• Regular security audits",
+                "• Maintain clean console",
+                "• Document coding standards"
+            ]
+        }
+    },
+    seo: {
+        poor: {
+            title: "Critical SEO Issues",
+            tips: [
+                "• Add meta descriptions",
+                "• Fix missing title tags",
+                "• Make site mobile-friendly",
+                "• Add structured data",
+                "• Fix broken links"
+            ]
+        },
+        fair: {
+            title: "SEO Needs Improvement",
+            tips: [
+                "• Optimize meta descriptions",
+                "• Improve URL structure",
+                "• Enhance content quality",
+                "• Add more structured data",
+                "• Improve internal linking"
+            ]
+        },
+        good: {
+            title: "Good SEO Practices",
+            tips: [
+                "• Monitor search performance",
+                "• Keep content fresh",
+                "• Maintain site structure",
+                "• Regular SEO audits",
+                "• Track user engagement"
+            ]
+        }
+    }
+};
+
+// Score Update Functions
+function updateScores(data) {
+    const categories = ['performance', 'accessibility', 'bestPractices', 'seo'];
+    
+    categories.forEach(category => {
+        ['mobile', 'desktop'].forEach(device => {
+            if (data[device] && typeof data[device][category] !== 'undefined') {
+                updateScoreCard(category, data[device][category], device);
+            }
+        });
+    });
+}
+
+function updateScoreCard(category, score, device) {
+    try {
+        const scoreElement = document.getElementById(`${device}-${category}`);
+        const barElement = document.getElementById(`${device}-${category}-bar`);
+        
+        if (!scoreElement || !barElement) {
+            console.error(`Elements not found for ${device}-${category}`);
+            return;
+        }
+
+        const formattedScore = typeof score === 'number' ? Math.round(score) : 0;
+        
+        // Update score display
+        scoreElement.textContent = `${formattedScore}%`;
+        
+        // Remove existing color classes
+        barElement.classList.remove('bg-red-600', 'bg-yellow-500', 'bg-green-600', 'bg-blue-600');
+        scoreElement.classList.remove('text-red-600', 'text-yellow-600', 'text-green-600', 'text-blue-600');
+        
+        // Add appropriate color class based on score
+        if (formattedScore < 50) {
+            barElement.classList.add('bg-red-600');
+            scoreElement.classList.add('text-red-600');
+        } else if (formattedScore < 90) {
+            barElement.classList.add('bg-yellow-500');
+            scoreElement.classList.add('text-yellow-600');
+        } else {
+            barElement.classList.add('bg-green-600');
+            scoreElement.classList.add('text-green-600');
+        }
+        
+        // Update width with a small delay for smooth animation
+        setTimeout(() => {
+            barElement.style.width = `${formattedScore}%`;
+        }, 50);
+    } catch (error) {
+        console.error('Error updating score card:', error);
+    }
+}
+
+// Modal Handling Functions
+function getSuggestions(category, score) {
+    let level;
+    if (score < 50) level = 'poor';
+    else if (score < 90) level = 'fair';
+    else level = 'good';
+    
+    return suggestions[category][level];
+}
+
+function showModal(card) {
+    if (!hasResults) return;
+
+    try {
+        const category = card.dataset.category;
+        const device = card.closest('#mobile-results') ? 'mobile' : 'desktop';
+        const scoreElement = document.getElementById(`${device}-${category}`);
+        const score = parseInt(scoreElement?.textContent) || 0;
+
+        const suggestionData = getSuggestions(category, score);
+        if (!suggestionData) return;
+
+        const modalTitle = document.getElementById('modal-title');
+        const modalScore = document.getElementById('modal-score');
+        const modalLevel = document.getElementById('modal-level');
+        const modalSuggestions = document.getElementById('modal-suggestions');
+
+        if (!modalTitle || !modalScore || !modalLevel || !modalSuggestions) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+        modalTitle.textContent = suggestionData.title;
+        modalScore.textContent = `Score: ${score}`;
+        
+        const level = score < 50 ? 'Poor' : score < 90 ? 'Fair' : 'Good';
+        modalLevel.textContent = level;
+        modalLevel.className = `score-level ${level.toLowerCase()}`;
+        
+        modalSuggestions.innerHTML = suggestionData.tips
+            .map(tip => `<li class="flex items-start"><span class="mr-2">•</span>${tip.replace('• ', '')}</li>`)
+            .join('');
+
+        const modal = document.getElementById('info-modal');
+        if (modal) modal.classList.remove('hidden');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+    }
+}
+
+function closeInfoModal() {
+    const modal = document.getElementById('info-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Tab Switching Function
+function switchTab(activeTab, elements) {
+    const { mobileTab, desktopTab, mobileResults, desktopResults } = elements;
+    const isDesktop = activeTab === 'desktop';
+    
+    mobileTab.classList.toggle('text-blue-600', !isDesktop);
+    mobileTab.classList.toggle('border-blue-600', !isDesktop);
+    mobileTab.classList.toggle('text-gray-500', isDesktop);
+    mobileTab.classList.toggle('border-transparent', isDesktop);
+    
+    desktopTab.classList.toggle('text-blue-600', isDesktop);
+    desktopTab.classList.toggle('border-blue-600', isDesktop);
+    desktopTab.classList.toggle('text-gray-500', !isDesktop);
+    desktopTab.classList.toggle('border-transparent', !isDesktop);
+    
+    mobileResults.style.display = isDesktop ? 'none' : 'grid';
+    desktopResults.style.display = isDesktop ? 'grid' : 'none';
+}
+function removeExistingListeners() {
+    document.querySelectorAll('.card').forEach(card => {
+        // Remove all existing click listeners
+        const clonedCard = card.cloneNode(true);
+        card.parentNode.replaceChild(clonedCard, card);
+    });
+}
+// Initialize Everything
+function initializeInterface() {
+    // Remove any existing listeners first
+    removeExistingListeners();
+    
+    // Disable cards initially
+    disableCardClicks();
+    
+    // Set up tabs
+    const mobileTab = document.getElementById('mobile-tab');
+    const desktopTab = document.getElementById('desktop-tab');
+    const mobileResults = document.getElementById('mobile-results');
+    const desktopResults = document.getElementById('desktop-results');
+
+    mobileTab.addEventListener('click', () => switchTab('mobile', { mobileTab, desktopTab, mobileResults, desktopResults }));
+    desktopTab.addEventListener('click', () => switchTab('desktop', { mobileTab, desktopTab, mobileResults, desktopResults }));
+
+    // Set up modal close handlers
+    document.getElementById('close-info-modal').addEventListener('click', closeInfoModal);
+    document.getElementById('info-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'info-modal') {
+            closeInfoModal();
+        }
     });
 
-    mobileTab.addEventListener('click', () => {
-        desktopTab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
-        mobileTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
-        desktopResults.style.display = 'none';
-        mobileResults.style.display = 'grid';
+    // Setup escape key handler
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeInfoModal();
+        }
     });
+
+    // Initialize UI state
+    resetUI();
+}
+
+// Start everything when the DOM is ready
+document.addEventListener('DOMContentLoaded', initializeInterface);
 </script>
 </body>
 </html>
