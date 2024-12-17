@@ -887,19 +887,23 @@ form.addEventListener('submit', async (e) => {
             formContainer.style.display = 'none';
         }
 
-       // Add consultation button if not exists
+// Add consultation button if not exists
 const heroSection = document.querySelector('.bg-gradient-to-br');
-if (heroSection) {
-    heroSection.className = 'flex items-center justify-center h-screen'; // Centering the button
-    if (!document.getElementById('book-consultation-btn')) {
-        const bookButton = document.createElement('a');
-        bookButton.id = 'book-consultation-btn';
-        bookButton.href = 'https://ontoplocal.com/designer';
-        bookButton.target = '_blank';
-        bookButton.textContent = 'Book a Free Consultation';
-        bookButton.className = 'inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors';
-        heroSection.appendChild(bookButton);
-    }
+if (heroSection && !document.getElementById('book-consultation-btn')) {
+    // Create a container div for centering
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex justify-center items-center w-full mt-8';
+
+    const bookButton = document.createElement('a');
+    bookButton.id = 'book-consultation-btn';
+    bookButton.href = 'https://ontoplocal.com/designer';
+    bookButton.target = '_blank';
+    bookButton.textContent = 'Book a Free Consultation';
+    bookButton.className = 'inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors';
+    
+    // Add button to container, then container to hero section
+    buttonContainer.appendChild(bookButton);
+    heroSection.appendChild(buttonContainer);
 }
 
         // Show loading state
